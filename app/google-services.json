@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "822545422448",
+    "firebase_url": "https://lifelineblood-96e4e.firebaseio.com",
+    "project_id": "lifelineblood-96e4e",
+    "storage_bucket": "lifelineblood-96e4e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822545422448:android:12e4a8d30536efe0",
+        "android_client_info": {
+          "package_name": "com.lifelineblood.lifelineblood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822545422448-tlv9bl4e80lpji8ssjl88i3bf4vjsu29.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "822545422448-tlv9bl4e80lpji8ssjl88i3bf4vjsu29.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2_dr4t7afJvq0otsKC4hIN8Q0FO7WYl4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
