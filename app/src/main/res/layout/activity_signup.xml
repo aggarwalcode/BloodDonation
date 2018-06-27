@@ -10,8 +10,8 @@ android:paddingBottom="@dimen/activity_vertical_margin"
 android:paddingLeft="@dimen/activity_horizontal_margin"
 android:paddingRight="@dimen/activity_horizontal_margin"
 android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/colPrimaryTr"
-tools:context=".activities.RegisterationAct">
+android:background="@color/colPrimaryTr"
+tools:context=".activities.SignUpAct">
 
 <!-- Login progress -->
 
@@ -21,12 +21,12 @@ tools:context=".activities.RegisterationAct">
         android:layout_width="0px"
         android:layout_height="0px"/>
 
-    <AutoCompleteTextView android:id="@+id/autotext"
+    <!--<AutoCompleteTextView android:id="@+id/autotext"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:nextFocusUp="@id/autotext"
         android:nextFocusLeft="@id/autotext"/>
-
+-->
 <ProgressBar
     android:id="@+id/login_progress"
     style="?android:attr/progressBarStyleLarge"
@@ -51,6 +51,7 @@ tools:context=".activities.RegisterationAct">
             android:layout_height="200dp"
             android:layout_gravity="center"
             android:foregroundGravity="center"
+            android:contentDescription="Logo"
             app:srcCompat="@drawable/red_drop" />
 
         <android.support.design.widget.TextInputLayout
@@ -142,14 +143,16 @@ tools:context=".activities.RegisterationAct">
             android:layout_marginTop="16dp"
             android:text="@string/action_sign_in_short"
             android:textStyle="bold" />
+
         <Button
             android:id="@+id/reset_pass"
-            style="?android:textAppearanceSmall"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:background="@null"
             android:text="@string/action_reset_pass"
-            android:textStyle="bold" />
+            android:textColor="@color/colorAccent" />
 
     </LinearLayout>
 </ScrollView>

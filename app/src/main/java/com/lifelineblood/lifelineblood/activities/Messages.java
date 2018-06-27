@@ -5,11 +5,11 @@ import android.os.Bundle;
 
 import com.lifelineblood.lifelineblood.R;
 
-public class NeedBlood extends AppCompatActivity {
+public class Messages extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_need_blood);
+        setContentView(R.layout.activity_messages);
     }
 }

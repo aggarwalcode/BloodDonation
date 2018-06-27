@@ -3,10 +3,16 @@ package com.lifelineblood.lifelineblood.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,33 +21,72 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.lifelineblood.lifelineblood.R;
+import com.lifelineblood.lifelineblood.fragments.DonateBlood;
+import com.lifelineblood.lifelineblood.fragments.HelpPage;
+import com.lifelineblood.lifelineblood.fragments.NeedBlood;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        NeedBlood.OnFragmentInteractionListener,
+        com.lifelineblood.lifelineblood.fragments.DonateBlood.OnFragmentInteractionListener,
+        com.lifelineblood.lifelineblood.fragments.HelpPage.OnFragmentInteractionListener{
+
     private static boolean isRegistered,isLogedin;
-    SharedPreferences mPreferences = SplashScreen.mPreferences;
+    SharedPreferences mPreferences;
+    TextView textViewEidNav;
+    static String emailId;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        isRegistered = mPreferences.getBoolean("isRegistered",false);
-        isLogedin = mPreferences.getBoolean("isLogedin",false);
+        /*isRegistered = mPreferences.getBoolean("isRegistered",false);
+        isLogedin = mPreferences.getBoolean("isLogedin",false);*/
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        context= getApplication();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        BottomNavigationView bottom_navigation = findViewById(R.id.bottom_navigation);
+
+       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+            }
+        });*/
+
+        bottom_navigation.setSelectedItemId(R.id.nav_home);
+        bottom_navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                if(id==R.id.nav_message){
+                    Intent intent = new Intent(MainActivity.this,Messages.class);
+                    startActivity(intent);
+                }
+                if(id==R.id.nav_help){
+                    Fragment fragment = new HelpPage();
+                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.add(R.id.container, fragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+                if(id==R.id.nav_account){
+                    Intent intent = new Intent(MainActivity.this,MyAccount.class);
+                    startActivity(intent);
+                }
+                return true;
             }
         });
 
@@ -51,8 +96,18 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        drawer.bringToFront();
+        drawer.requestLayout();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header=navigationView.getHeaderView(0);
+
+        textViewEidNav = (TextView) header.findViewById(R.id.textViewEidNav);
+        mPreferences = context.getSharedPreferences("activity.SplashScreen", MODE_PRIVATE);
+        emailId =mPreferences.getString("emailId",null);
+
+        textViewEidNav.setText(emailId);
     }
 
     @Override
@@ -122,12 +177,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void donateBlood(View view) {
-        Intent intent = new Intent(MainActivity.this,DonateBlood.class);
-        startActivity(intent);
+
+        /*SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("isNeedy",true);
+        editor.apply();*/
+
+        Fragment fragment = new DonateBlood();
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container, fragment,"YOUR_FRAGMENT_STRING_TAG");
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     public void needBlood(View view) {
-        Intent intent = new Intent(MainActivity.this,NeedBlood.class);
-        startActivity(intent);
+
+        /*SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("isDoner",true);
+        editor.apply();*/
+
+        Fragment fragment = new NeedBlood();
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container, fragment,"YOUR_FRAGMENT_STRING_TAG");
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

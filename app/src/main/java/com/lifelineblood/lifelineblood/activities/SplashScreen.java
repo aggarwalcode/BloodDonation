@@ -1,11 +1,13 @@
 package com.lifelineblood.lifelineblood.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
+import com.lifelineblood.lifelineblood.R;
 
 public class SplashScreen extends AppCompatActivity {
     private static boolean isRegistered;
@@ -21,7 +23,8 @@ public class SplashScreen extends AppCompatActivity {
 
         editor.putBoolean("isRegistered", false);
         editor.putBoolean("isLogedin", false);
-        editor.commit();
+        editor.putString("emailID",null);
+        editor.apply();
 
         isRegistered = mPreferences.getBoolean("isRegistered",false);
         isLogedin = mPreferences.getBoolean("isLogedin",false);
@@ -33,15 +36,19 @@ public class SplashScreen extends AppCompatActivity {
         }
 
         else if(!isRegistered){
-            Intent intent = new Intent(this, RegisterationAct.class);
+            Intent intent = new Intent(this, SignUpAct.class);
             startActivity(intent);
             finish();
         }
 
-        else if(isRegistered==true && isLogedin==true){
+        else if(isRegistered && isLogedin){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
+        }
+
+        else {
+            Toast.makeText(SplashScreen.this, R.string.error_splash, Toast.LENGTH_LONG).show();
         }
 
         /*SharedPreferences mPreferences = getSharedPreferences("activity.SplashScreen", Context.MODE_PRIVATE);

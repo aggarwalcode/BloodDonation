@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -46,8 +45,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.lifelineblood.lifelineblood.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 
 /**
  * A login screen that offers login via email/password.
@@ -59,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public static FirebaseAuth auth;
     private static final int REQUEST_READ_CONTACTS = 0;
-    Button btnRegister;
+    Button btnRegister,resetPassBtn;
     private static boolean authSuccess;
     private static final String TAG = null;
     Intent intent;
@@ -78,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    public static AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -98,6 +95,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
         btnRegister = (Button) findViewById(R.id.email_register);
+        resetPassBtn = (Button)findViewById(R.id.reset_pass);
 
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -130,7 +128,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterationAct.class);
+                Intent intent = new Intent(LoginActivity.this, SignUpAct.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        resetPassBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, ResetPassAct.class);
                 startActivity(intent);
                 finish();
             }
@@ -408,7 +414,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 authSuccess = true;
                                 SharedPreferences.Editor editor = mPreferences.edit();
                                 editor.putBoolean("isLogedin", true);
-                                editor.commit();
+                                editor.putString("emailId",mEmail);
+                                editor.apply();
                                 intent = new Intent(LoginActivity.this, MainActivity.class);
                                 LoginActivity.this.startActivity(intent);
                                 // Account exists, return true if the password matches.

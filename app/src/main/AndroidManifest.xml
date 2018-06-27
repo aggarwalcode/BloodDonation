@@ -24,29 +24,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".activities.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="com.lifelineblood.lifelineblood.EXCLASS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.LoginActivity"
-            android:noHistory="true"
-            android:label="@string/title_activity_login" />
-
+            android:label="@string/title_activity_login"
+            android:noHistory="true" />
         <activity
-            android:name=".activities.RegisterationAct"
-            android:noHistory="true"
-            android:label="@string/app_name" />
-
+            android:name=".activities.SignUpAct"
+            android:label="@string/app_name"
+            android:noHistory="true" />
         <activity android:name=".activities.ResetPassAct" />
-        <activity android:name=".activities.DonateBlood" />
-        <activity android:name=".activities.NeedBlood"></activity>
+        <activity android:name=".activities.Messages" />
+        <activity android:name=".activities.MyAccount"/>
     </application>
 
 </manifest>
