@@ -7,9 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -24,22 +22,29 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.lifelineblood.lifelineblood.R;
-import com.lifelineblood.lifelineblood.fragments.DonateBlood;
+import com.lifelineblood.lifelineblood.fragments.RequestForm;
+import com.lifelineblood.lifelineblood.fragments.RequestingForBlood;
+import com.lifelineblood.lifelineblood.fragments.WantToDonate;
 import com.lifelineblood.lifelineblood.fragments.HelpPage;
-import com.lifelineblood.lifelineblood.fragments.NeedBlood;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        NeedBlood.OnFragmentInteractionListener,
-        com.lifelineblood.lifelineblood.fragments.DonateBlood.OnFragmentInteractionListener,
+        RequestingForBlood.OnFragmentInteractionListener,
+        WantToDonate.OnFragmentInteractionListener,
+        com.lifelineblood.lifelineblood.fragments.RequestForm.OnFragmentInteractionListener,
         com.lifelineblood.lifelineblood.fragments.HelpPage.OnFragmentInteractionListener{
 
     private static boolean isRegistered,isLogedin;
     SharedPreferences mPreferences;
     TextView textViewEidNav;
-    static String emailId;
+    public static String emailId;
     Context context;
+    DatabaseReference databaseReference;
+
+    private final static String TAG_FRAGMENT = "REQUEST_FORM_FRAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,12 +117,38 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+            return;
+        }
+
+        else {
             super.onBackPressed();
         }
+
+        final RequestingForBlood fragment = (RequestingForBlood) getSupportFragmentManager().
+                findFragmentByTag("RequestingForBlood");
+        try{
+            fragment.allowBackPressed();
+            getSupportFragmentManager().popBackStack();
+            return;
+        }catch (Exception e){
+
+        }
+
+        final RequestForm fragmentb = (RequestForm) getSupportFragmentManager().
+                findFragmentByTag("RequestForm");
+        try{
+            fragmentb.allowBackPressed();
+            getSupportFragmentManager().popBackStack();
+            return;
+        }catch (Exception e){
+
+        }
+        //super.onBackPressed();
     }
 
     @Override
@@ -148,13 +179,15 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_request) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_donation) {
 
         } else if (id == R.id.logOut) {
+
             SharedPreferences.Editor editor = mPreferences.edit();
             editor.putBoolean("isLogedin", false);
+            editor.putString("emailID",null);
             editor.apply();
 
             FirebaseAuth.getInstance().signOut();
@@ -181,27 +214,26 @@ public class MainActivity extends AppCompatActivity
         /*SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean("isNeedy",true);
         editor.apply();*/
-
-        Fragment fragment = new DonateBlood();
+        Fragment fragment = new WantToDonate();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container, fragment,"YOUR_FRAGMENT_STRING_TAG");
+        transaction.add(R.id.container, fragment,"WantToDonate");
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
     public void needBlood(View view) {
-
         /*SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean("isDoner",true);
         editor.apply();*/
 
-        Fragment fragment = new NeedBlood();
+        Fragment fragment = new RequestingForBlood();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container, fragment,"YOUR_FRAGMENT_STRING_TAG");
+        transaction.add(R.id.container, fragment,"RequestingForBlood");
         transaction.addToBackStack(null);
         transaction.commit();
+
     }
 
     @Override

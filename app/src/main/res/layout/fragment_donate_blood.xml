@@ -7,7 +7,7 @@
     android:background="#ffffff"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".fragments.DonateBlood">
+    tools:context=".fragments.WantToDonate">
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView

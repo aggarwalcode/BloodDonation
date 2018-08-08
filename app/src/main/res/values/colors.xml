@@ -5,5 +5,6 @@
     <color name="colorAccent">#65d16b</color>
     <color name="colPrimaryTr">#99e43326</color>
     <color name="colorAccentTr">#9065d16b</color>
+    <color name="white">#ffffff</color>
 
 </resources>

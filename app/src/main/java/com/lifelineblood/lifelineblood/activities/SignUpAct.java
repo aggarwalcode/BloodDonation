@@ -27,24 +27,36 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.lifelineblood.lifelineblood.R;
+import com.lifelineblood.lifelineblood.modelclass.BloodRequesteeDetails;
+import com.lifelineblood.lifelineblood.modelclass.UserCredientials;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 public class SignUpAct extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword, contactNum, nameView;
     private Button btnSignIn, btnRegister, btnResetPassword;
-    Spinner bloodGroupSpn;
+    private Spinner bloodGroupSpn;
     private ProgressBar progressBar;
-    private FirebaseAuth auth;
-    String email,nameVal,mobNum,bloodGrp;
-    static String fBaseId;
+
+    String nameVal;          String addressVal;
+    String bloodgroupVal;    String emailVal;
+    String contactNumVal;    SimpleDateFormat timestampVal;
+    String fBaseIdVal;       String sexVal;
+    String isNeedy;          String isDoner;
+    int ageVal;
+
     boolean allowSubmit;
-    SimpleDateFormat timestamp;
+    UserCredientials userCredientials;
+
+    private FirebaseAuth auth;
     private DatabaseReference databaseReference;
+
     String[] bloodGrpArr = new String[]{"Select Blood Group", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -63,8 +75,8 @@ public class SignUpAct extends AppCompatActivity {
         btnResetPassword = (Button) findViewById(R.id.reset_pass);
         contactNum = (EditText) findViewById(R.id.mobileNo);
         nameView = (EditText) findViewById(R.id.name);
-        bloodGroupSpn = (Spinner) findViewById(R.id.bloodgroup);
 
+        bloodGroupSpn = (Spinner) findViewById(R.id.bloodgroup);
         ArrayAdapter<String> adapterBgp = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, bloodGrpArr
         );
@@ -127,10 +139,10 @@ public class SignUpAct extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
 
                         } else {
-                            fBaseId = auth.getCurrentUser().getUid();
+                            fBaseIdVal = auth.getCurrentUser().getUid();
 
                             addUser();
-                            startActivity(new Intent(SignUpAct.this, MainActivity.class));
+                            startActivity(new Intent(SignUpAct.this, LoginActivity.class));
                             finish();
                         }
                     }
@@ -152,11 +164,10 @@ public class SignUpAct extends AppCompatActivity {
     private void addUser() {
 
         allowSubmit = true;
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(fBaseIdVal);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(fBaseId);
-
-        email = inputEmail.getText().toString().trim();
-        if (!(Patterns.EMAIL_ADDRESS.matcher(email).matches()))
+        emailVal = inputEmail.getText().toString().trim();
+        if (!(Patterns.EMAIL_ADDRESS.matcher(emailVal).matches()))
         {
             allowSubmit = false;
             inputEmail.setError("Enter Correct Email");
@@ -169,39 +180,50 @@ public class SignUpAct extends AppCompatActivity {
             nameView.setError(getString(R.string.blank_field));
         }
 
-        mobNum = contactNum.getText().toString().trim();
-        if (TextUtils.isEmpty(mobNum)&&(mobNum.length()<10)){
+        contactNumVal = contactNum.getText().toString().trim();
+        if (TextUtils.isEmpty(contactNumVal)&&(contactNumVal.length()<10)){
 
             allowSubmit = false;
             nameView.setError(getString(R.string.mobNum_size));
         }
 
-        bloodGrp = bloodGroupSpn.getSelectedItem().toString().trim();
+        bloodgroupVal = bloodGroupSpn.getSelectedItem().toString().trim();
         if (bloodGroupSpn.getSelectedItem().toString()=="Select Blood Group"){
 
             allowSubmit = false;
             ((TextView)bloodGroupSpn.getSelectedView()).setError("None Selected");
         }
 
-        timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-        String sdf = timestamp.format(Calendar.getInstance().getTime());
+        addressVal = "";
+        sexVal="";
+        ageVal=0;
+        isDoner="";
+        isNeedy="";
 
-        Map newUser = new HashMap();
-        newUser.put("name",nameVal);
-        newUser.put("email",email);
-        newUser.put("mobileNo",mobNum);
-        newUser.put("bloodGroup",bloodGrp);
-        newUser.put("timestamp",sdf);
-        newUser.put("fBaseId",fBaseId);
+        timestampVal = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+        String sdf = timestampVal.format(Calendar.getInstance().getTime());
+
+        try {
+            userCredientials = new UserCredientials(
+                    nameVal, addressVal, bloodgroupVal, emailVal,
+                    contactNumVal, sdf, fBaseIdVal, sexVal, ageVal,isDoner,isNeedy
+            );
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(), ""+e,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        userCredientials.getAddress();
 
         if(allowSubmit){
-            databaseReference.setValue(newUser);
+            databaseReference.setValue(userCredientials);
             Toast.makeText(getApplicationContext(), "Registeration Successful", Toast.LENGTH_SHORT).show();
 
             SharedPreferences mPreferences = getSharedPreferences("activity.SplashScreen", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mPreferences.edit();
             editor.putBoolean("isLogedin", true);
             editor.putBoolean("isRegistered", true);
+            editor.putString("emailId",emailVal);
             editor.apply();
         }
         else {

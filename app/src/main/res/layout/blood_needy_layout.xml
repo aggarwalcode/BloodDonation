@@ -22,6 +22,8 @@
             android:layout_height="100dp"
             android:layout_gravity="top"
             android:contentDescription="@string/user_picture"
+            android:background="@drawable/dp"
+            android:padding="5dp"
             android:scaleType="centerCrop" />
 
         <RelativeLayout
@@ -78,21 +80,21 @@
                 android:id="@+id/buttona"
                 android:layout_weight="1"
                 android:padding="2dp"
-                android:text="But1"
+                android:text="Blood"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/buttonb"
                 android:layout_weight="1"
                 android:padding="2dp"
-                android:text="But2"
+                android:text="Platelets"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/buttonc"
                 android:layout_weight="1"
                 android:padding="2dp"
-                android:text="But3"
+                android:text="Message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>

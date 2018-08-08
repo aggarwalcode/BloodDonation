@@ -7,12 +7,13 @@
     android:background="#ffffff"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".fragments.NeedBlood">
+    tools:context=".fragments.RequestingForBlood">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/frag_need_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="Your request for blood is Unset" />
 
 </FrameLayout>

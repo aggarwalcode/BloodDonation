@@ -13,20 +13,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lifelineblood.lifelineblood.R;
-import com.lifelineblood.lifelineblood.modelclass.BloodNeedyModel;
+import com.lifelineblood.lifelineblood.modelclass.BloodRequesteeDetails;
+import com.lifelineblood.lifelineblood.modelclass.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class BloodNeedy extends RecyclerView.Adapter<BloodNeedy.NeedyViewHolder>{
+public class DisplayNeedRequestToDoner extends RecyclerView.Adapter<DisplayNeedRequestToDoner.NeedyViewHolder>{
 
     public Context context;
 
-    public static List<BloodNeedyModel> mBloodNeedyLi;
+    public static List<BloodRequesteeDetails> mBloodNeedyLi;
 
-    public BloodNeedy() {
+    public DisplayNeedRequestToDoner() {
     }
 
-    public BloodNeedy(Context applicationContext, List<BloodNeedyModel> bloodNeedyList) {
+    public DisplayNeedRequestToDoner(Context applicationContext, List<BloodRequesteeDetails> bloodNeedyList) {
         this.context = applicationContext;
         this.mBloodNeedyLi=bloodNeedyList;
     }
@@ -44,12 +46,19 @@ public class BloodNeedy extends RecyclerView.Adapter<BloodNeedy.NeedyViewHolder>
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(@NonNull NeedyViewHolder needyViewHolder, int i) {
-        BloodNeedyModel mBloodNeedyI = mBloodNeedyLi.get(i);
+        BloodRequesteeDetails mBloodNeedyI = mBloodNeedyLi.get(i);
 
-        needyViewHolder.nameOfNeedy.setText("mBloodNeedyI.getName()");
-        needyViewHolder.locationOfNeedy.setText("mBloodNeedyI.getAddress()");
-        needyViewHolder.blood_Group.setText("mBloodNeedyI.getBloodgroup()");
-        needyViewHolder.displayPic.setImageResource(R.drawable.dp);
+        needyViewHolder.nameOfNeedy.setText(mBloodNeedyI.getName());
+        needyViewHolder.locationOfNeedy.setText(mBloodNeedyI.getAddress());
+        needyViewHolder.blood_Group.setText(mBloodNeedyI.getBloodgroup());
+        //needyViewHolder.displayPic.setImageResource(R.drawable.dp);
+        /*Picasso.get().load("https://lh3.googleusercontent.com/-pjLD_WmdDXY/AAAAAAAAAAI/AAAAAAAAAAA/YDhZJ6ieBLg/s64-c/100166102678933298897.jpg?size=50")
+                .into(needyViewHolder.displayPic);*/
+        Picasso.get()
+                .load("https://pikmail.herokuapp.com/"+mBloodNeedyI.getEmail()+"?size=50")
+                .transform(new CircleTransform())
+                .into(needyViewHolder.displayPic);
+
 
         /*needyViewHolder.email.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,7 +71,7 @@ public class BloodNeedy extends RecyclerView.Adapter<BloodNeedy.NeedyViewHolder>
 
     @Override
     public int getItemCount() {
-        return 1;
+        return mBloodNeedyLi.size();
     }
 
     public class NeedyViewHolder extends RecyclerView.ViewHolder {

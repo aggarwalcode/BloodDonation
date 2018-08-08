@@ -17,21 +17,25 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.lifelineblood.lifelineblood.R;
-import com.lifelineblood.lifelineblood.adapterclass.BloodNeedy;
-import com.lifelineblood.lifelineblood.modelclass.BloodNeedyModel;
+import com.lifelineblood.lifelineblood.adapterclass.DisplayNeedRequestToDoner;
+import com.lifelineblood.lifelineblood.modelclass.BloodRequesteeDetails;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import static com.lifelineblood.lifelineblood.activities.LoginActivity.auth;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DonateBlood.OnFragmentInteractionListener} interface
+ * {@link WantToDonate.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DonateBlood#newInstance} factory method to
+ * Use the {@link WantToDonate#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DonateBlood extends Fragment {
+public class WantToDonate extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -43,12 +47,13 @@ public class DonateBlood extends Fragment {
 
     DatabaseReference databaseReference;
     RecyclerView rvBloodNeedy;
-    BloodNeedy mAdapter;
-    List<BloodNeedyModel> bloodNeedyList = new ArrayList<>();
+    DisplayNeedRequestToDoner mAdapter;
+    List<BloodRequesteeDetails> bloodNeedyList = new ArrayList<>();
+    String sdf;             SimpleDateFormat timestamp=null;
 
     private OnFragmentInteractionListener mListener;
 
-    public DonateBlood() {
+    public WantToDonate() {
         // Required empty public constructor
     }
 
@@ -58,11 +63,11 @@ public class DonateBlood extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment DonateBlood.
+     * @return A new instance of fragment WantToDonate.
      */
     // TODO: Rename and change types and number of parameters
-    public static DonateBlood newInstance(String param1, String param2) {
-        DonateBlood fragment = new DonateBlood();
+    public static WantToDonate newInstance(String param1, String param2) {
+        WantToDonate fragment = new WantToDonate();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -89,14 +94,19 @@ public class DonateBlood extends Fragment {
         rvBloodNeedy.addItemDecoration(new DividerItemDecoration(
                 rvBloodNeedy.getContext(), DividerItemDecoration.VERTICAL));
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("bloodneedy");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+        sdf = timestamp.format(Calendar.getInstance().getTime());
+
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("users").child(auth.getUid()).child("isDoner").setValue("true");
+        databaseReference.child("users").child(auth.getUid()).child("lastClickOnDonate").setValue(sdf);
+        databaseReference.child("needRequests").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    BloodNeedyModel bloodNeedyModel = postSnapshot.getValue(BloodNeedyModel.class);
-                    bloodNeedyList.add(bloodNeedyModel);
-                    mAdapter = new BloodNeedy(getContext(), bloodNeedyList);
+                    BloodRequesteeDetails bloodRequesteeDetails = postSnapshot.getValue(BloodRequesteeDetails.class);
+                    bloodNeedyList.add(bloodRequesteeDetails);
+                    mAdapter = new DisplayNeedRequestToDoner(getContext(), bloodNeedyList);
                     rvBloodNeedy.setAdapter(mAdapter);
                 }
             }

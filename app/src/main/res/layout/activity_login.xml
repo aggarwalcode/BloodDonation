@@ -12,12 +12,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/colPrimaryTr"
     tools:context=".activities.LoginActivity">
-<!--
+
     <LinearLayout
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_width="0px"
-        android:layout_height="0px"/>-->
+        android:layout_height="0px"/>
 
 <!--    <AutoCompleteTextView android:id="@+id/autotext"
         android:layout_width="0dp"

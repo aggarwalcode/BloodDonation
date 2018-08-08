@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.lifelineblood.lifelineblood.R;
 
 public class SplashScreen extends AppCompatActivity {
@@ -20,6 +21,7 @@ public class SplashScreen extends AppCompatActivity {
 
         mPreferences = getSharedPreferences("activity.SplashScreen", MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         editor.putBoolean("isRegistered", false);
         editor.putBoolean("isLogedin", false);
