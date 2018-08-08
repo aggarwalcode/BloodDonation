@@ -7,8 +7,27 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.lifelineblood.lifelineblood.R;
+import com.lifelineblood.lifelineblood.activities.MainActivity;
+import com.lifelineblood.lifelineblood.modelclass.BloodRequesteeDetails;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.lifelineblood.lifelineblood.activities.LoginActivity.auth;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +47,30 @@ public class RequestForm extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    TextView nameOfNeedy; TextView ageOfNeedy; TextView mobileNo; TextView placeofNeed;
+    TextView inHospital; TextView need_response_text;
+    Spinner spinnerBgP;
+    Button btnRequestBlood;
+    ProgressBar progressBar;
+    RadioGroup radioGroup,bloodType;
+    RadioButton radioSexButton,rbBloodType;
+    RadioButton radioFemaleBut,radioPlatletBut;
+    BloodRequesteeDetails bloodRequesteeDetails;
+
+
+
+    String[] bloodGrpArr = new String[]{"Select Blood Group", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+
+    String name=null;       String hospital=null;
+    String address=null;    String bloodgroup=null;
+    String email=null;      String contactNum=null;
+    String fBaseId=null;    String requestedBy=null;
+    String sex=null;        int age = 0;
+    String sdf;             boolean allowSubmit;
+    String bloodTypeVal;    SimpleDateFormat timestamp=null;
+
     private OnFragmentInteractionListener mListener;
+    DatabaseReference databaseReference;
 
     public RequestForm() {
         // Required empty public constructor
@@ -65,7 +107,145 @@ public class RequestForm extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.frag_request_form, container, false);
+        View view = inflater.inflate(R.layout.frag_request_form, container, false);
+
+        spinnerBgP = (Spinner) view.findViewById(R.id.blood_group_rf);
+        btnRequestBlood = (Button) view.findViewById(R.id.request_form);
+        nameOfNeedy = (TextView) view.findViewById(R.id.nameRf);
+        ageOfNeedy = (TextView) view.findViewById(R.id.ageRf);
+        mobileNo = (TextView) view.findViewById(R.id.mobileNoRf);
+        placeofNeed = (TextView) view.findViewById(R.id.locationRf);
+        inHospital = (TextView) view.findViewById(R.id.hospitalRf);
+        radioGroup = (RadioGroup) view.findViewById(R.id.radioGrpRf);
+        bloodType = (RadioGroup) view.findViewById(R.id.blood_type);
+        progressBar = (ProgressBar) view.findViewById(R.id.progress_rf);
+        radioFemaleBut = (RadioButton) view.findViewById(R.id.radioFemale);
+        radioPlatletBut = (RadioButton) view.findViewById(R.id.radioPlatlet);
+        need_response_text = RequestingForBlood.need_response_text;
+
+        ArrayAdapter<String> adapterBgp = new ArrayAdapter<>(
+                getContext(), android.R.layout.simple_spinner_dropdown_item, bloodGrpArr
+        );
+
+        spinnerBgP.setAdapter(adapterBgp);
+        btnRequestBlood.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                generateRequest();
+            }
+        });
+
+        return view;
+    }
+
+    private void generateRequest() {
+        readFormDetails();
+        validate();
+        try {
+            bloodRequesteeDetails = new BloodRequesteeDetails(
+                    name, address, bloodgroup,email,
+                    contactNum, sdf,fBaseId, requestedBy,
+                    sex,age, hospital,bloodTypeVal
+            );
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(), ""+e,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        //Call Database Refrence to store user request
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        fBaseId = databaseReference.push().getKey();
+
+        if(allowSubmit) {
+            databaseReference.child("needRequests").child(fBaseId).setValue(bloodRequesteeDetails);
+            databaseReference.child("users").child(auth.getUid()).child("isNeedy").setValue("true");
+            Toast.makeText(getContext(),R.string.request_placed,Toast.LENGTH_SHORT).show();
+            need_response_text.setText(R.string.request_placed);
+            getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        }
+        else {
+            Toast.makeText(getContext(),"Check Errors",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void readFormDetails() {
+
+        name = nameOfNeedy.getText().toString().trim();
+        hospital = inHospital.getText().toString().trim();
+        address = placeofNeed.getText().toString().trim();
+
+        if(!(ageOfNeedy.getText().toString().equals(""))){
+            age = Integer.parseInt(ageOfNeedy.getText().toString());
+        }
+
+
+        contactNum= mobileNo.getText().toString().trim();
+        bloodgroup = spinnerBgP.getSelectedItem().toString().trim();
+
+        timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+        sdf = timestamp.format(Calendar.getInstance().getTime());
+
+        int id = radioGroup.getCheckedRadioButtonId();
+        if(id>0) {
+            radioSexButton = (RadioButton) getView().findViewById(id);
+            sex = radioSexButton.getText().toString().trim().toLowerCase();
+        }
+
+        email = MainActivity.emailId;
+        requestedBy = FirebaseAuth.getInstance().getUid();
+
+        int idBtype = bloodType.getCheckedRadioButtonId();
+        if(id>0) {
+            rbBloodType = (RadioButton) getView().findViewById(idBtype);
+            bloodTypeVal = rbBloodType.getText().toString().trim().toLowerCase();
+        }
+
+    }
+
+    private void validate() {
+
+        allowSubmit =  true;
+
+        if(name.length()<3){
+            nameOfNeedy.setError("Fill the name");
+            allowSubmit = false;
+        }
+
+        if(sex == null){
+            radioFemaleBut.setError("Select one");
+            allowSubmit = false;
+        }
+
+        if(contactNum.length()<10){
+            mobileNo.setError("Fill currect mobile number");
+            allowSubmit = false;
+        }
+
+        if (spinnerBgP.getSelectedItem().toString().equals("Select Blood Group") ||bloodgroup==null){
+            ((TextView)spinnerBgP.getSelectedView()).setError("Select one");
+            allowSubmit = false;
+        }
+
+        if(age == 0){
+            ageOfNeedy.setError("Fill age");
+            allowSubmit = false;
+        }
+
+        if(address.length()<3){
+            placeofNeed.setError("Fill correct address");
+            allowSubmit = false;
+        }
+
+        if(hospital.length()<3){
+            inHospital.setError("Fill hospital name");
+            allowSubmit = false;
+        }
+
+        if(bloodTypeVal == null){
+            radioPlatletBut.setError("Select one");
+            allowSubmit = false;
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -90,6 +270,10 @@ public class RequestForm extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public boolean allowBackPressed() {
+        return true;
     }
 
     /**
